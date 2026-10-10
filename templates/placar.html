@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-title"><h2>Placar geral</h2><a class="btn primary" href="{{ url_for('jogo') }}">Voltar ao jogo</a></div>
+<div class="ranking">
+    {% for e in equipes %}
+        <div class="rank-card">
+            <div class="rank-pos">{{ loop.index }}º</div>
+            <div>
+                <h3>{{ e.nome }}</h3>
+                <p>{{ e.pontuacao }} ponto(s)</p>
+            </div>
+        </div>
+    {% else %}
+        <p>Nenhuma equipe cadastrada.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-title"><h2>Importar perguntas por CSV</h2></div>
+<div class="form-card">
+    <p>O arquivo deve conter os cabeçalhos:</p>
+    <pre>tema,nivel,enunciado,alternativa_a,alternativa_b,alternativa_c,alternativa_d,resposta_correta</pre>
+    <form method="post" enctype="multipart/form-data">
+        <label>Arquivo CSV
+            <input type="file" name="arquivo" accept=".csv" required>
+        </label>
+        <div class="actions">
+            <button class="btn primary" type="submit">Importar</button>
+            <a class="btn" href="{{ url_for('exemplo_csv') }}">Baixar exemplo</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

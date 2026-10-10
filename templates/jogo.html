@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-title">
+    <h2>Tela do jogo</h2>
+    <a class="btn" href="{{ url_for('placar') }}">Ver placar</a>
+</div>
+
+{% if not equipes %}
+<div class="alert alert-warning">Cadastre pelo menos uma equipe antes de iniciar o jogo.</div>
+{% endif %}
+
+<section class="game-layout">
+    <aside class="panel">
+        <div class="round-box">
+            <span>Rodada</span>
+            <strong>{{ rodada }}</strong>
+        </div>
+
+        <h3>Equipe da vez</h3>
+        {% if equipe_atual %}
+            <div class="team-current">
+                <strong>{{ equipe_atual.nome }}</strong>
+                <span>{{ equipe_atual.pontuacao }} ponto(s)</span>
+            </div>
+            <form method="post" action="{{ url_for('jogo_proxima_equipe') }}">
+                <button class="btn full" type="submit">Passar para próxima equipe</button>
+            </form>
+        {% else %}
+            <p>Nenhuma equipe cadastrada.</p>
+        {% endif %}
+
+        <h3>Sortear pergunta</h3>
+        <form method="post" action="{{ url_for('jogo_sortear') }}">
+            <label>Nível
+                <select name="nivel">
+                    <option value="">Qualquer nível</option>
+                    <option>Fácil</option>
+                    <option>Médio</option>
+                    <option>Difícil</option>
+                </select>
+            </label>
+            <label>Tema
+                <select name="tema">
+                    <option value="">Qualquer tema</option>
+                    {% for t in temas %}
+                        <option value="{{ t.tema }}">{{ t.tema }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button class="btn primary full" type="submit" {% if not equipe_atual %}disabled{% endif %}>Sortear</button>
+        </form>
+
+        {% if equipe_atual %}
+        <h3>Ajudas da equipe</h3>
+        <div class="help-status">
+            <div class="help-status-item {% if equipe_atual.ajuda_perguntar %}used{% else %}available{% endif %}">
+                <span>Perguntar à equipe</span>
+                <strong>{% if equipe_atual.ajuda_perguntar %}Usada{% else %}Disponível{% endif %}</strong>
+            </div>
+            <div class="help-status-item {% if equipe_atual.ajuda_anular %}used{% else %}available{% endif %}">
+                <span>Anular 2 alternativas</span>
+                <strong>{% if equipe_atual.ajuda_anular %}Usada{% else %}Disponível{% endif %}</strong>
+            </div>
+            <div class="help-status-item {% if equipe_atual.ajuda_pular %}used{% else %}available{% endif %}">
+                <span>Pular</span>
+                <strong>{% if equipe_atual.ajuda_pular %}Usada{% else %}Disponível{% endif %}</strong>
+            </div>
+        </div>
+        {% endif %}
+    </aside>
+
+    <section class="question-card">
+        {% if pergunta %}
+            <div class="game-topline">
+                <div class="badge">{{ pergunta.tema }} · {{ pergunta.nivel }} · Vale {{ pontos }} pontos</div>
+                <div class="timer" id="timer" data-seconds="{{ tempo_pergunta }}">{{ tempo_pergunta }}</div>
+            </div>
+
+            <h2>{{ pergunta.enunciado }}</h2>
+
+            <div class="alternatives">
+                {% set alts = {'A': pergunta.alternativa_a, 'B': pergunta.alternativa_b, 'C': pergunta.alternativa_c, 'D': pergunta.alternativa_d} %}
+                {% for letra, texto in alts.items() %}
+                    <div class="alternative {% if letra in alternativas_ocultas %}hidden-alt{% endif %}">
+                        <strong>{{ letra }})</strong>
+                        {% if letra in alternativas_ocultas %}Alternativa anulada{% else %}{{ texto }}{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if equipe_atual %}
+            <form class="answer-form" method="post" action="{{ url_for('jogo_responder') }}">
+                <p class="current-answer-label">Resposta da equipe: <strong>{{ equipe_atual.nome }}</strong></p>
+                <div class="answer-buttons">
+                    {% for r in ['A','B','C','D'] %}
+                        <button class="btn answer" name="resposta" value="{{ r }}" type="submit">Responder {{ r }}</button>
+                    {% endfor %}
+                </div>
+            </form>
+
+            <div class="help-box">
+                <h3>Ajudas disponíveis nesta vez</h3>
+                <div class="help-grid">
+                    <form method="post" action="{{ url_for('ajuda_perguntar') }}">
+                        <button class="btn" type="submit" {% if equipe_atual.ajuda_perguntar %}disabled{% endif %}>Perguntar à equipe</button>
+                    </form>
+                    <form method="post" action="{{ url_for('ajuda_anular') }}">
+                        <button class="btn" type="submit" {% if equipe_atual.ajuda_anular %}disabled{% endif %}>Anular 2 alternativas</button>
+                    </form>
+                    <form method="post" action="{{ url_for('ajuda_pular') }}">
+                        <button class="btn" type="submit" {% if equipe_atual.ajuda_pular %}disabled{% endif %}>Pular</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <h2>Nenhuma pergunta sorteada</h2>
+                {% if equipe_atual %}
+                    <p>Rodada {{ rodada }} · Agora é a vez da equipe <strong>{{ equipe_atual.nome }}</strong>.</p>
+                    <p>Use o painel à esquerda para sortear uma pergunta disponível.</p>
+                {% else %}
+                    <p>Cadastre equipes para iniciar a dinâmica.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </section>
+</section>
+
+<script>
+(function () {
+    const timer = document.getElementById('timer');
+    if (!timer) return;
+
+    let remaining = parseInt(timer.dataset.seconds || '30', 10);
+    timer.textContent = remaining;
+
+    const tick = setInterval(() => {
+        remaining -= 1;
+        timer.textContent = remaining;
+
+        if (remaining <= 10) {
+            timer.classList.add('timer-warning');
+        }
+
+        if (remaining <= 0) {
+            clearInterval(tick);
+            timer.textContent = 'Tempo!';
+            timer.classList.add('timer-ended');
+        }
+    }, 1000);
+})();
+</script>
+{% endblock %}

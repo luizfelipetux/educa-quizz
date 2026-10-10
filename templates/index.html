@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+    <div>
+        <h2>Bem-vindo ao jogo!</h2>
+        <p>Cadastre perguntas, organize equipes e conduza uma competição de revisão no estilo Show do Milhão.</p>
+        <div class="actions">
+            <a class="btn primary" href="{{ url_for('jogo') }}">Iniciar jogo</a>
+            <a class="btn" href="{{ url_for('pergunta_nova') }}">Cadastrar pergunta</a>
+            <a class="btn" href="{{ url_for('equipes') }}">Cadastrar equipes</a>
+        </div>
+    </div>
+    <div class="score-card">
+        <h3>Resumo</h3>
+        <p><strong>{{ total_perguntas }}</strong> pergunta(s) cadastrada(s)</p>
+        <p><strong>{{ total_equipes }}</strong> equipe(s) cadastrada(s)</p>
+        <form method="post" action="{{ url_for('reiniciar') }}" onsubmit="return confirm('Deseja zerar placar, ajudas e perguntas usadas?')">
+            <button class="btn danger" type="submit">Reiniciar jogo</button>
+        </form>
+    </div>
+</section>
+
+<section class="grid cards">
+    <a class="card" href="{{ url_for('perguntas') }}">
+        <h3>Banco de perguntas</h3>
+        <p>Cadastre, edite, exclua e importe perguntas por CSV.</p>
+    </a>
+    <a class="card" href="{{ url_for('jogo') }}">
+        <h3>Tela do jogo</h3>
+        <p>Sorteie perguntas, use ajudas e registre as respostas das equipes.</p>
+    </a>
+    <a class="card" href="{{ url_for('placar') }}">
+        <h3>Placar</h3>
+        <p>Acompanhe a pontuação geral em tempo real.</p>
+    </a>
+</section>
+{% endblock %}

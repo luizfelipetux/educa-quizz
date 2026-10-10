@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-title"><h2>{{ titulo }}</h2></div>
+<form class="form-card" method="post">
+    <label>Tema
+        <input name="tema" required value="{{ pergunta.tema if pergunta else '' }}" placeholder="Ex.: Redes, HTML, Cabos UTP">
+    </label>
+    <label>Nível
+        <select name="nivel" required>
+            {% for n in ['Fácil', 'Médio', 'Difícil'] %}
+                <option value="{{ n }}" {% if pergunta and pergunta.nivel == n %}selected{% endif %}>{{ n }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Enunciado
+        <textarea name="enunciado" required rows="4">{{ pergunta.enunciado if pergunta else '' }}</textarea>
+    </label>
+    <div class="grid two">
+        <label>Alternativa A<input name="alternativa_a" required value="{{ pergunta.alternativa_a if pergunta else '' }}"></label>
+        <label>Alternativa B<input name="alternativa_b" required value="{{ pergunta.alternativa_b if pergunta else '' }}"></label>
+        <label>Alternativa C<input name="alternativa_c" required value="{{ pergunta.alternativa_c if pergunta else '' }}"></label>
+        <label>Alternativa D<input name="alternativa_d" required value="{{ pergunta.alternativa_d if pergunta else '' }}"></label>
+    </div>
+    <label>Resposta correta
+        <select name="resposta_correta" required>
+            {% for r in ['A','B','C','D'] %}
+                <option value="{{ r }}" {% if pergunta and pergunta.resposta_correta == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <div class="actions">
+        <button class="btn primary" type="submit">Salvar</button>
+        <a class="btn" href="{{ url_for('perguntas') }}">Cancelar</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or 'Show da Informática' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+        <span class="logo">★</span>
+        <div>
+            <h1>Show da Informática</h1>
+            <p>Dinâmica de perguntas e respostas para sala de aula</p>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('jogo') }}">Jogo</a>
+        <a href="{{ url_for('perguntas') }}">Perguntas</a>
+        <a href="{{ url_for('equipes') }}">Equipes</a>
+        <a href="{{ url_for('placar') }}">Placar</a>
+    </nav>
+</header>
+
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    Sistema local em Flask + SQLite. Ideal para uso com projetor em sala de aula.
+</footer>
+</body>
+</html>
